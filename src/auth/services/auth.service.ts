@@ -23,7 +23,7 @@ export class AuthService {
     email: string,
     password: string,
     rememberMe: boolean
-  ): Promise<string> {
+  ): Promise<{ refresh_token: string }> {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       // TODO protect this against timing attacks
@@ -41,7 +41,7 @@ export class AuthService {
     );
     await this.updateRefreshToken(user.id, refreshToken);
 
-    return refreshToken;
+    return { refresh_token: refreshToken };
   }
 
   async logout(userId: number): Promise<void> {

@@ -21,7 +21,7 @@ export class AuthController {
   @Post("login")
   async signIn(
     @Body(new ValidationPipe()) signInDto: SignInDto
-  ): Promise<string> {
+  ): Promise<{ refresh_token: string }> {
     const refreshToken = await this.authService.signIn(
       signInDto.email,
       signInDto.password,
