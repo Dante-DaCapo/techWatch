@@ -8,13 +8,15 @@ import {
   PIN_REPOSITORY,
   PinRepositoryPort,
 } from "../database/pin.repository.port";
+import { TagService } from "./tag.service";
 
 @Injectable()
 export class PinService {
   constructor(
     @Inject(PIN_REPOSITORY)
     private readonly pinRepository: PinRepositoryPort,
-    private readonly fetchUrlService: FetchUrlService
+    private readonly fetchUrlService: FetchUrlService,
+    private readonly tagService: TagService
   ) {}
 
   findByIdAndUser(id: number, user: User): Promise<Pin> {
@@ -26,7 +28,7 @@ export class PinService {
   }
 
   searchPins(search: string, user: User): Promise<Pin[]> {
-    return this.pinRepository.searchByString(search, user);
+    return this.pinRepository.searchByString(search.toLowerCase(), user);
   }
 
   async deleteByIdAndUser(id: number, user: User): Promise<void> {
@@ -34,7 +36,17 @@ export class PinService {
     if (!pin) {
       throw new Error("Pin not found for user. Cannot perform delete");
     }
-    return this.pinRepository.deleteById(pin.id);
+    const tags: Tag[] = pin.tags;
+    await this.pinRepository.deleteById(pin.id);
+    for (const tag of tags) {
+      const pin: Pin | undefined = await this.pinRepository.findOneByUserAndTag(
+        user,
+        tag
+      );
+      if (!pin) {
+        await this.tagService.deleteTagById(tag.id);
+      }
+    }
   }
 
   createPin(createPinDto: CreatePinDto, user: User): Promise<Pin> {

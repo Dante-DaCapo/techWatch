@@ -1,9 +1,10 @@
 import { InjectRepository } from "@nestjs/typeorm";
-import { Like, Repository } from "typeorm";
+import { In, Like, Repository } from "typeorm";
 import { Pin } from "../entities/pin";
 import { Injectable } from "@nestjs/common";
 import { PinRepositoryPort } from "./pin.repository.port";
 import { User } from "src/users/entities/user.entity";
+import { Tag } from "../entities/tag";
 
 @Injectable()
 export class PinRepository implements PinRepositoryPort {
@@ -19,6 +20,7 @@ export class PinRepository implements PinRepositoryPort {
   findAllByUser(user: User): Promise<Pin[]> {
     return this.pinTypeOrmRepository.findBy({ user });
   }
+
   searchByString(search: string, user: User): Promise<Pin[]> {
     return this.pinTypeOrmRepository.findBy({
       user,
@@ -26,9 +28,15 @@ export class PinRepository implements PinRepositoryPort {
     });
   }
 
-  deleteById(id: number): Promise<void> {
-    this.pinTypeOrmRepository.delete(id);
-    return;
+  findOneByUserAndTag(user: User, tag: Tag): Promise<Pin | undefined> {
+    return this.pinTypeOrmRepository.findOneBy({
+      user,
+      tags: tag,
+    });
+  }
+
+  async deleteById(id: number): Promise<void> {
+    await this.pinTypeOrmRepository.delete(id);
   }
 
   persitsPin(pin: Pin): Promise<Pin> {

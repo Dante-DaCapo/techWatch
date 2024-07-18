@@ -18,7 +18,9 @@ export class Tag {
   @Column()
   name: string;
 
-  @ManyToMany(() => Pin, (pin) => pin.tags)
+  @ManyToMany(() => Pin, (pin) => pin.tags, {
+    onDelete: "CASCADE",
+  })
   @JoinTable()
   pins: Pin[];
 
