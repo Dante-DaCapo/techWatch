@@ -13,4 +13,9 @@ export class TagService {
   findAllByUser(user: User): Promise<Tag[]> {
     return this.tagRepository.findBy({ user });
   }
+
+  deleteTagById(tagId: number): Promise<void> {
+    this.tagRepository.delete(tagId);
+    return;
+  }
 }
