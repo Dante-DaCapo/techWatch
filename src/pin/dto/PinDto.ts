@@ -1,4 +1,4 @@
-import { IsArray, IsNumber, IsString, IsUrl } from "class-validator";
+import { IsArray, IsDate, IsNumber, IsString, IsUrl } from "class-validator";
 
 export class PinDto {
   @IsNumber()
@@ -18,4 +18,7 @@ export class PinDto {
 
   @IsArray()
   tags: string[];
+
+  @IsDate()
+  createdDate: Date;
 }

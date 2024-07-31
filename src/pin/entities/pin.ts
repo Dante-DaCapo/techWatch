@@ -1,6 +1,7 @@
 import { Exclude } from "class-transformer";
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToMany,
   ManyToOne,
@@ -27,6 +28,9 @@ export class Pin {
   @Column()
   sourceUrl: string;
 
+  @CreateDateColumn()
+  createdDate: Date;
+
   @ManyToOne(() => User, (user) => user.pins)
   user: User;
 
@@ -49,6 +53,7 @@ export class Pin {
     pinDto.imageUrl = this.imageUrl;
     pinDto.sourceUrl = this.sourceUrl;
     pinDto.tags = this.tags.map((tag) => tag.name);
+    pinDto.createdDate = this.createdDate;
     return pinDto;
   }
 }

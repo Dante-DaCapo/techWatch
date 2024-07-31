@@ -4,11 +4,12 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CreateUserDto } from "../dto/createUser.dto";
 import * as bcrypt from "bcrypt";
+import { UpdatePasswordDto } from "../dto/updatePasswordDto";
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    @InjectRepository(User) private readonly usersRepository: Repository<User>
   ) {}
 
   findById(id: number): Promise<User | undefined> {
@@ -54,5 +55,19 @@ export class UsersService {
     });
 
     return this.usersRepository.save(user);
+  }
+
+  async updatePassword(updatePasswordDto: UpdatePasswordDto, user: User) {
+    const isMatch = await bcrypt.compare(
+      updatePasswordDto.currentPassword,
+      user.password
+    );
+    if (!isMatch) {
+      throw new UnauthorizedException();
+    }
+    const salt = await bcrypt.genSalt();
+    const hash = await bcrypt.hash(updatePasswordDto.newPassword, salt);
+    user.password = hash;
+    this.usersRepository.save(user);
   }
 }
